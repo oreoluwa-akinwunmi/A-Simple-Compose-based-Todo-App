@@ -1,4 +1,4 @@
-package com.example.asimplecompose_basedtodoapp
+package com.example.asimplecompose_basedtodoapp.model
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
