@@ -1,8 +1,8 @@
 package com.example.asimplecompose_basedtodoapp
 
-import screens.AddTaskScreen
-import screens.CompletedScreen
-import screens.HomeScreen
+import com.example.asimplecompose_basedtodoapp.screens.AddTaskScreen
+import com.example.asimplecompose_basedtodoapp.screens.CompletedScreen
+import com.example.asimplecompose_basedtodoapp.screens.HomeScreen
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost

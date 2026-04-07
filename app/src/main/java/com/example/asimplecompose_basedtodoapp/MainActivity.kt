@@ -42,3 +42,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+
+// error message: task field cannot be empty....doesnt pop back
+// back button

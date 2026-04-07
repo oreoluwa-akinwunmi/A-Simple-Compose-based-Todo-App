@@ -1,4 +1,4 @@
-package screens
+package com.example.asimplecompose_basedtodoapp.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,17 +7,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -36,8 +42,24 @@ fun HomeScreen(navController: NavController, viewModel: TaskViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Only fetch incomplete tasks
+
     val incompleteTasks = viewModel.tasks.filter { !it.isCompleted }
+
+    val message = navController
+        .currentBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("message")
+
+    LaunchedEffect(message) {
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+
+            // Clears it after showing
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<String>("message")
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -48,13 +70,28 @@ fun HomeScreen(navController: NavController, viewModel: TaskViewModel) {
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {navController.navigate(Screen.AddTaskScreen.route) }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add"
+                )
+            }
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            // Completed tasks button
+            TextButton(
+                onClick = { navController.navigate(Screen.CompletedScreen.route) }) {
+                Text("View Completed Tasks")
+            }
             if (incompleteTasks.isEmpty()) {
                 EmptyState(isCompletedScreen = false)
             } else {
@@ -86,21 +123,8 @@ fun HomeScreen(navController: NavController, viewModel: TaskViewModel) {
                 }
             }
 
-            // Bottom Right Buttons
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Button(onClick = { navController.navigate(Screen.CompletedScreen.route) }) {
-                    Text("View Completed Tasks")
-                }
-                Button(onClick = { navController.navigate(Screen.AddTaskScreen.route) }) {
-                    Text("Add Task")
-                }
-            }
+
         }
+
     }
 }

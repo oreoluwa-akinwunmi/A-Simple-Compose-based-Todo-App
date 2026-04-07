@@ -15,7 +15,7 @@ fun EmptyState(isCompletedScreen: Boolean, modifier: Modifier = Modifier.fillMax
     val message = if (isCompletedScreen) {
         "No completed tasks yet"
     } else {
-        "No tasks yet"
+        "No tasks to be done"
     }
 
     Box(
