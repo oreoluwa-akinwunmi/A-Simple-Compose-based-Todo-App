@@ -1,50 +1,64 @@
 package com.example.asimplecompose_basedtodoapp.model
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.asimplecompose_basedtodoapp.TaskRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
+@Entity(tableName = "tasks")
 data class Task(
-    val id: Int,
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
     val title: String,
     var isCompleted: Boolean = false
 )
 
-class TaskViewModel : ViewModel() {
-    // This holds the master list of tasks
-    var tasks = mutableStateListOf<Task>()
-        private set
+class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
+    // Observe tasks as a Flow from the DB
+    val tasks: Flow<List<Task>> = repository.allTasks
 
     // Variables to track recently deleted task for the Undo feature
     private var recentlyDeletedTask: Task? = null
-    private var recentlyDeletedIndex: Int? = null
 
     fun addTask(title: String) {
-        tasks.add(Task(id = tasks.size, title = title))
+        viewModelScope.launch {
+            repository.addTask(Task(title = title))
+        }
     }
 
     fun toggleTask(task: Task) {
-        val index = tasks.indexOf(task)
-        if (index != -1) {
-            tasks[index] = task.copy(isCompleted = !task.isCompleted)
+        viewModelScope.launch {
+            repository.updateTask(task.copy(isCompleted = !task.isCompleted))
         }
     }
 
     fun deleteTask(task: Task) {
-        val index = tasks.indexOf(task)
-        if (index != -1) {
+        viewModelScope.launch {
+            repository.deleteTask(task)
             recentlyDeletedTask = task
-            recentlyDeletedIndex = index
-            tasks.removeAt(index)
         }
     }
 
     fun undoDelete() {
-        val task = recentlyDeletedTask
-        val index = recentlyDeletedIndex
-        if (task != null && index != null) {
-            tasks.add(index, task)
-            recentlyDeletedTask = null
-            recentlyDeletedIndex = null
+        viewModelScope.launch {
+            recentlyDeletedTask?.let {
+                repository.addTask(it)
+                recentlyDeletedTask = null
+            }
         }
+    }
+
+    // Factory needed because ViewModel now has a constructor parameter
+    companion object {
+        fun factory(repository: TaskRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                    TaskViewModel(repository) as T
+            }
     }
 }

@@ -18,6 +18,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -26,6 +28,7 @@ import androidx.navigation.NavController
 import com.example.asimplecompose_basedtodoapp.model.EmptyState
 import com.example.asimplecompose_basedtodoapp.model.TaskViewModel
 import com.example.asimplecompose_basedtodoapp.model.TodoItemRow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,8 +37,9 @@ fun CompletedScreen(navController: NavController, viewModel: TaskViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val tasks by viewModel.tasks.collectAsState(initial = emptyList())
     // Only fetch completed tasks
-    val completedTasks = viewModel.tasks.filter { it.isCompleted }
+    val completedTasks = tasks.filter { it.isCompleted }
 
     Scaffold(
         topBar = {

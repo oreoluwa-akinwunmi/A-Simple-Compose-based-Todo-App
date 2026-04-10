@@ -43,9 +43,9 @@ fun TodoItemRow(
                 text = task.title,
                 style = TextStyle(
                     textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
-                    textAlign = TextAlign.Center
+                    // textAlign = TextAlign.Center
                 ),
-                modifier = Modifier.fillMaxWidth()
+                // modifier = Modifier.fillMaxWidth()
             )
         }
 

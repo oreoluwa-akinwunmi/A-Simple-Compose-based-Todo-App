@@ -4,6 +4,8 @@ import com.example.asimplecompose_basedtodoapp.screens.AddTaskScreen
 import com.example.asimplecompose_basedtodoapp.screens.CompletedScreen
 import com.example.asimplecompose_basedtodoapp.screens.HomeScreen
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,10 +14,12 @@ import com.example.asimplecompose_basedtodoapp.model.TaskViewModel
 import com.example.asimplecompose_basedtodoapp.screens.Screen
 
 @Composable
-fun Navigation() {
+fun Navigation(repository: TaskRepository) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+
     // By creating the ViewModel here, it will be shared across all screens in the NavHost
-    val taskViewModel: TaskViewModel = viewModel()
+    val taskViewModel: TaskViewModel = viewModel(factory = TaskViewModel.factory(repository))
 
     NavHost(navController = navController, startDestination = Screen.HomeScreen.route) {
         composable(route = Screen.HomeScreen.route) {
